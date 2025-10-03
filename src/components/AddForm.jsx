@@ -7,8 +7,9 @@ const AddTodoForm = ({ onAdd, isDark }) => {
   const [category, setCategory] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [errors, setErrors] = useState({});
-  const [toast, setToast] = useState(null); 
+  const [toast, setToast] = useState(null);
 
+  // Validate the form
   const validateForm = useCallback(() => {
     const newErrors = {};
 
@@ -16,11 +17,11 @@ const AddTodoForm = ({ onAdd, isDark }) => {
       newErrors.text = "Todo text must be at least 3 characters";
     }
 
-    if (!category) {
+    if (!category || category.trim() === "") {
       newErrors.category = "Category is required";
     }
 
-    if (!dueDate) {
+    if (!dueDate || dueDate.trim() === "") {
       newErrors.dueDate = "Due date is required";
     }
 
@@ -28,6 +29,7 @@ const AddTodoForm = ({ onAdd, isDark }) => {
     return Object.keys(newErrors).length === 0;
   }, [text, category, dueDate]);
 
+  // Reset form
   const resetForm = () => {
     setText("");
     setCategory("");
@@ -35,6 +37,7 @@ const AddTodoForm = ({ onAdd, isDark }) => {
     setErrors({});
   };
 
+  // Handle submit
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
@@ -42,14 +45,15 @@ const AddTodoForm = ({ onAdd, isDark }) => {
       if (validateForm()) {
         onAdd(text.trim(), category, dueDate);
         resetForm();
-        setToast({ message: "Todo added successfully!", type: "success" }); // ✅ success toast
+        setToast({ message: "Todo added successfully!", type: "success" });
       } else {
-        setToast({ message: "Please fix the errors!", type: "error" }); // ✅ error toast
+        setToast({ message: "Please fix the errors!", type: "error" });
       }
     },
     [validateForm, onAdd, text, category, dueDate]
   );
 
+  // Dynamic input classes
   const inputClassName = useMemo(
     () =>
       `w-full px-4 py-3 rounded-lg border-2 transition-all ${
@@ -102,9 +106,7 @@ const AddTodoForm = ({ onAdd, isDark }) => {
             aria-invalid={!!errors.text}
             autoFocus
           />
-          {errors.text && (
-            <p className="text-red-500 text-sm mt-1">{errors.text}</p>
-          )}
+          {errors.text && <p className="text-red-500 text-sm mt-1">{errors.text}</p>}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -142,22 +144,14 @@ const AddTodoForm = ({ onAdd, isDark }) => {
           </div>
         </div>
 
-        <button
-          type="submit"
-          className={buttonClassName}
-          disabled={!text || !category || !dueDate}
-        >
+        <button type="submit" className={buttonClassName}>
           <Plus className="w-5 h-5" />
           Add Todo
         </button>
       </form>
 
       {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
     </>
   );
